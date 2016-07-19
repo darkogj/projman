@@ -1,0 +1,107 @@
+﻿@model IEnumerable<Domain.Entities.Project>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>All projects</h2>
+
+
+<div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" id="edit-project-container">
+
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" id="details-project-containe">
+
+
+        </div>
+    </div>
+</div>
+
+
+<div id="list-of-projects">
+    @Html.Partial("_ProjectsTable")
+</div>
+
+    @if (ViewBag.Page > 0)
+    {
+        <a href="@Url.Action("Index", new { page = ViewBag.Page - 1 })"
+           class="btn btn-default">
+            &laquo; Prev
+        </a>
+    }
+    @if (ViewBag.Page < ViewBag.MaxPage)
+    {
+        <a href="@Url.Action("Index", new { page = ViewBag.Page + 1 })"
+           class="btn btn-default">
+            Next &raquo;
+        </a>
+    }
+
+    @section Scripts
+    {
+        <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+        <script>
+            function updateSuccess() {
+                alert('Completed!');
+                setTimeout(function () { $("#modal-button-close").trigger('click') }, 500);
+
+            }
+
+            $(function () {
+                $("#list-of-projects")
+                    .on("click",
+                        ".project-delete",
+                        function (evt) {
+                            var link = $(this);
+                            evt.preventDefault();
+                            bootbox.confirm("Are you sure?",
+                                function (answer) {
+                                    if (answer) {
+                                        $.ajax({
+                                            url: '/projects/DeleteConfirmed?id=' + link.attr('data-project-id'),
+                                            method: 'POST',
+                                            complete: function () {
+                                                link.parents('tr').remove();
+                                            }
+                                        });
+                                    }
+                                });
+
+                        });
+
+                $('#list-of-projects').on('click', '.project-edit', function (evt) {
+                    var element = $(this);
+                    evt.preventDefault();
+                    var url = "/Projects/Edit"; // the url to the controller
+                    var id = $(this).attr('data-project-id'); // the id that's given to each button in the list
+                    $.get(url + '/' + id, function (data) {
+                        $('#edit-project-container')
+                            .prepend(data);
+                    });
+                });
+
+                $('#list-of-projects').on('click', '.project-details', function (evt) {
+                    var element = $(this);
+                    evt.preventDefault();
+                    var url = "/Projects/Details"; // the url to the controller
+                    var id = $(this).attr('data-project-id'); // the id that's given to each button in the list
+
+                    $.get(url + '/' + id, function (data) {
+                        $('#details-project-container')
+                            .html(data);
+                    });
+                });
+
+
+            });
+        </script>
+    }

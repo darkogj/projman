@@ -1,0 +1,98 @@
+﻿@model IEnumerable<Domain.Entities.Task>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>All Tasks</h2>
+
+<p>
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#createTaskModal">Create new task</button>
+</p>
+@Html.Action("Create")
+
+<div class="modal fade" id="editTaskModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" id="edit-task-container">
+
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsTaskModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" id="details-task-container">
+
+
+        </div>
+    </div>
+</div>
+
+
+<div id="list-of-tasks">
+    @Html.Partial("_TasksTable")
+        </div>
+
+        @section Scripts
+        {
+
+            <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+            <script>
+                function updateSuccess() {
+                    alert('Successfully updated!');
+                    setTimeout(function() { $("#modal-button-close").trigger('click') }, 500);
+
+                }
+
+                $(function () {
+                    $('#startDate').datepicker({ dateFormat: 'yy-mm-dd' });
+                    $('#endDate').datepicker({ dateFormat: 'yy-mm-dd' });
+
+
+                    $("#list-of-tasks")
+                        .on("click",
+                            ".task-delete",
+                            function (evt) {
+                                var link = $(this);
+                                evt.preventDefault();
+                                bootbox.confirm("Are you sure?",
+                                    function (answer) {
+                                        if (answer) {
+                                            $.ajax({
+                                                url: '/tasks/DeleteConfirmed?id=' + link.attr('data-task-id'),
+                                                method: 'POST',
+                                                complete: function () {
+                                                    link.parents('tr').remove();
+                                                }
+                                            });
+                                        }
+                                    });
+
+                            });
+
+                    $('#list-of-tasks').on('click', '.task-edit', function (evt) {
+                        var element = $(this);
+                        evt.preventDefault();
+                        var url = "/Tasks/Edit"; // the url to the controller
+                        var id = $(this).attr('data-task-id'); // the id that's given to each button in the list
+                        $.get(url + '/' + id, function (data) {
+                            $('#edit-task-container')
+                                .prepend(data);
+                        });
+                    });
+                });
+
+                $('#list-of-tasks').on('click', '.task-details', function (evt) {
+                    var element = $(this);
+                    evt.preventDefault();
+                    var url = "/Tasks/Details"; // the url to the controller
+                    var id = $(this).attr('data-task-id'); // the id that's given to each button in the list
+
+                    $.get(url + '/' + id, function (data) {
+                        $('#details-task-container')
+                            .html(data);
+                    });
+                });
+            </script>
+        }

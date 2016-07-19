@@ -1,0 +1,136 @@
+﻿@model ProjectManagement.Models.TasksByStatus
+
+@{
+    ViewBag.Title = "Mine";
+}
+
+<h2>My tasks</h2>
+
+
+<div class="row">
+    <div class="col-xs-3" style="border: 10px">
+        <p>ToDo</p>
+        <ul id="todo" style="width: 300px; height: 300px; background-color: #82DDF0;">
+            @foreach (var item in Model.ToDo)
+            {
+                <li id="@item.ID">@item.Name</li>
+            }
+        </ul>
+    </div>
+
+    <div class="col-xs-3">
+        <p>In Progress</p>
+        <ul id="inprogress" style="width: 300px; height: 300px; background-color: #ABC8C0">
+            @foreach (var item in Model.InProgress)
+            {
+                <li id="@item.ID">@item.Name</li>
+            }
+        </ul>
+    </div>
+
+    <div class="col-xs-3">
+        <p>In Testing (QA)</p>
+        <ul id="intesting" style="width: 300px; height: 300px; background-color: #DAF7DC">
+            @foreach (var item in Model.InTesting)
+            {
+                <li id="@item.ID">@item.Name</li>
+            }
+        </ul>
+    </div>
+
+
+    <div class="col-xs-3">
+        <p>Done</p>
+        <ul id="done" style="width: 300px; height: 300px; background-color: yellowgreen">
+            @foreach (var item in Model.Done)
+            {
+                <li id="@item.ID">@item.Name</li>
+            }
+        </ul>
+    </div>
+
+</div>
+
+
+@section styles
+{
+    <style>
+        ul {
+            list-style-type: none;
+        }
+
+        .grid .item img {
+            cursor: move;
+            cursor: -webkit-grabbing;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
+
+    <script>
+            Sortable.create(todo, {
+                group: {
+                    name: 'todo',
+                    put: ['inprogress', 'intesting']
+                },
+                animation: 100,
+
+                onAdd: function (evt) {
+                    $.ajax({
+                        url: '/tasks/ChangeTaskStatusTo?id=' + evt.item.id + '&taskStatusId=0',
+                        method: 'POST'
+                    });
+                }
+            });
+
+            Sortable.create(inprogress, {
+                group: {
+                    name: 'inprogress',
+                    put: ['todo']
+                },
+                animation: 100,
+                onAdd: function (evt) {
+                    $.ajax({
+                        url: '/tasks/ChangeTaskStatusTo?id=' + evt.item.id + '&taskStatusId=1',
+                        method: 'POST'
+                    });
+                }
+            });
+
+            Sortable.create(intesting, {
+                group: {
+                    name: 'intesting',
+                    put: ['todo', 'inprogress']
+                },
+                animation: 100,
+                onAdd: function (evt) {
+                    $.ajax({
+                        url: '/tasks/ChangeTaskStatusTo?id=' + evt.item.id + '&taskStatusId=2',
+                        method: 'POST'
+                    });
+                }
+            });
+
+            Sortable.create(done,
+            {
+                group: {
+                    name: 'done',
+                    put: ['inprogress', 'intesting']
+                },
+                animation: 100,
+                onAdd: function (evt) {
+                    $.ajax({
+                        url: '/tasks/ChangeTaskStatusTo?id=' + evt.item.id + '&taskStatusId=3',
+                        method: 'POST'
+                    });
+                }
+            });
+
+
+    </script>
+}
+
+
+

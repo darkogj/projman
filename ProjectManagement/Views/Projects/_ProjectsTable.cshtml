@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Domain.Entities.Project>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Project name")
+        </th>
+        <th>
+            @Html.DisplayName("Customer's name")
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.DateCreated)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr data-project-id="@item.ID">
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.Name)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCreated)
+            </td>
+            <td>
+                @Html.ActionLink("See Tasks", "SeeTasks", new {projectId = item.ID}) |
+
+
+                @Html.ActionLink("Edit", "Edit", new {id = item.ID}, new {data_project_id = item.ID, @class = "project-edit", data_toggle = "modal", data_target = "#editProjectModal"}) |
+                @Html.ActionLink("Details", "Details", new {id = item.ID}, new {data_project_id = item.ID, @class = "project-details", data_target = "#detailsProjectModal", data_toggle = "modal"}) |
+                @Html.ActionLink("Delete", "Delete", new {id = item.ID}, new {@class = "project-delete", data_project_id = item.ID})
+            </td>
+        </tr>
+    }
+
+</table>
+
